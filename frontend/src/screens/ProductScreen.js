@@ -1,26 +1,37 @@
 import "./ProductScreen.css";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
 
 //Actions
 
 import { getProductDetails } from "../redux/actions/productActions";
 import { addToCart } from "../redux/actions/cartActions";
 
-const ProductScreen = ({ match, history }) => {
-  console.log("match", match);
-
+const ProductScreen = () => {
   const [qty, setQty] = useState(1);
   const dispatch = useDispatch();
+  const params = useParams();
+  const navigate = useNavigate();
+
+  console.log("params", params);
+  console.log("navigate", navigate);
 
   const productDetails = useSelector((state) => state.getProductDetails);
   const { loading, error, product } = productDetails;
 
   useEffect(() => {
-    if (product && match.params.id !== product._id) {
-      dispatch(getProductDetails(match.params.id));
+    if (product && params.id !== product._id) {
+      dispatch(getProductDetails(params.id));
     }
-  }, [dispatch, product, match, productDetails]);
+  }, [dispatch, product, params, productDetails]);
+
+  const priceChangeHandler = (e) => setQty(e.target.value);
+
+  const addToCartHandler = () => {
+    dispatch(addToCart(product._id, qty));
+    navigate("/cart", { replace: true });
+  };
 
   console.log("productdetails", productDetails);
   return (
@@ -52,15 +63,18 @@ const ProductScreen = ({ match, history }) => {
               </p>
               <p>
                 Qty
-                <select>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
+                <select value={qty} onChange={priceChangeHandler}>
+                  {[...Array(product.countInStock).keys()].map((x) => (
+                    <option key={x + 1} value={x + 1}>
+                      {x + 1}
+                    </option>
+                  ))}
                 </select>
               </p>
               <p>
-                <button type="button">Add to cart</button>
+                <button type="button" onClick={addToCartHandler}>
+                  Add to cart
+                </button>
               </p>
             </div>
           </div>
