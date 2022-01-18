@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import "./SideDrawer.css";
 
@@ -8,6 +9,14 @@ const SideDrawer = ({ show, click }) => {
   if (show) {
     sideDrawerClass.push("show");
   }
+
+  const cart = useSelector((state) => state.cart);
+  const { cartItems } = cart;
+
+  const getCartCount = () => {
+    return cartItems.reduce((qty, item) => qty + Number(item.qty), 0);
+  };
+
   return (
     <div className={sideDrawerClass.join(" ")}>
       <ul className="sidedrawer__links" onClick={click}>
@@ -15,7 +24,7 @@ const SideDrawer = ({ show, click }) => {
           <Link to="/cart">
             <i className="fas fa-shopping-cart" />
             <span>
-              Cart <span className="sidedrawer__cartbadge">0</span>
+              Cart <span className="sidedrawer__cartbadge">{getCartCount()}</span>
             </span>
           </Link>
         </li>
